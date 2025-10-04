@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, List
 import json
 import uuid
+import os
 
 # Create FastAPI app instance
 app = FastAPI()
@@ -10,11 +11,17 @@ app = FastAPI()
 # Enable CORS so React frontend can communicate with backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React default port
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://tetris-frontend-production.vercel.app",  # ← Add your Vercel URL (you'll get this next)
+        "*"  # ← Temporary: allow all origins (remove later for security)
+    ],
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 # Store active WebSocket connections
 # Key: room_id, Value: list of WebSocket connections in that room
@@ -137,4 +144,5 @@ async def broadcast_to_room(room_id: str, message: dict, exclude: WebSocket = No
 if __name__ == "__main__":
     import uvicorn
     # Run the server on port 8000
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
