@@ -13,9 +13,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://localhost:3000",
-        "https://tetris-frontend-production.vercel.app",  # ← Add your Vercel URL (you'll get this next)
-        "*"  # ← Temporary: allow all origins (remove later for security)
+        "https://tetris-frontend-123.vercel.app/",  # ← Add your Vercel URL (you'll get this next)
     ],
     allow_credentials=True,
     allow_methods=["*"],
