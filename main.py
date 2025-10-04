@@ -1,9 +1,13 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Dict, List
+from typing import Dict, List, Optional
 import json
 import uuid
 import os
+import asyncio
+from datetime import datetime
+from models import Room, Player, GameStatus, PlayerStatus, GameMessage, CreateRoomResponse
+from game_logic import TetrisGame
 
 # Create FastAPI app instance
 app = FastAPI()
@@ -21,13 +25,17 @@ app.add_middleware(
 )
 
 
-# Store active WebSocket connections
-# Key: room_id, Value: list of WebSocket connections in that room
-active_rooms: Dict[str, List[WebSocket]] = {}
+# Store active rooms with proper game state management
+# Key: room_id, Value: Room object
+rooms: Dict[str, Room] = {}
 
-# Store game states for each room
-# Key: room_id, Value: game state data
-game_states: Dict[str, dict] = {}
+# Store player WebSocket connections
+# Key: player_id, Value: WebSocket
+player_connections: Dict[str, WebSocket] = {}
+
+# Store player games
+# Key: player_id, Value: TetrisGame instance
+player_games: Dict[str, TetrisGame] = {}
 
 
 @app.get("/")
